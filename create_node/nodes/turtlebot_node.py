@@ -64,7 +64,7 @@ from sensor_msgs.msg import JointState
 
 from create_driver import Turtlebot, MAX_WHEEL_SPEED, DriverError
 from create_node.msg import TurtlebotSensorState, Drive, Turtle
-from create_node.srv import SetTurtlebotMode,SetTurtlebotModeResponse, SetDigitalOutputs, SetDigitalOutputsResponse
+from create_node.srv import SetTurtlebotMode,SetTurtlebotModeResponse, SetDigitalOutputs, SetDigitalOutputsResponse, SetCleanMotors, SetCleanMotorsResponse
 from create_node.diagnostics import TurtlebotDiagnostics
 import create_node.robot_types as robot_types
 from create_node.covariances import \
@@ -177,6 +177,7 @@ class TurtlebotNode(object):
         self.sensor_state_pub = rospy.Publisher('~sensor_state', TurtlebotSensorState, queue_size=10)
         self.operating_mode_srv = rospy.Service('~set_operation_mode', SetTurtlebotMode, self.set_operation_mode)
         self.digital_output_srv = rospy.Service('~set_digital_outputs', SetDigitalOutputs, self.set_digital_outputs)
+        self.set_clean_motors_srv = rospy.Service('~set_clean_motors', SetCleanMotors, self.set_clean_motors)
 
         if self.drive_mode == 'twist':
             self.cmd_vel_sub = rospy.Subscriber('cmd_vel', Twist, self.cmd_vel)
@@ -314,6 +315,12 @@ class TurtlebotNode(object):
         outputs = [req.digital_out_0,req.digital_out_1, req.digital_out_2]
         self._set_digital_outputs(outputs)
         return SetDigitalOutputsResponse(True)
+
+    def set_clean_motors(self, req):
+        if not self.robot.sci:
+            raise Exception("Robot not connected, SCI not available")
+        self.robot.motors(req.side_brush, req.vacuum, req.main_brush)
+        return SetCleanMotorsResponse(True)
 
     def sense(self, sensor_state):
         self.sensor_handler.get_all(sensor_state)

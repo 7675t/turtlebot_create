@@ -390,6 +390,17 @@ class Roomba(object):
     time.sleep(0.5)
     self.sci.force_seeking_dock()
 
+  def motors(self, side_brush, vacuum, main_brush):
+    """Activate/Deactivate other motors(side brush, vacuum and main brush)"""
+    data = 0
+    if side_brush:
+      data |= 0x01
+    if vacuum:
+      data |= 0x02
+    if main_brush:
+      data |= 0x04
+    self.sci.motors(*(data,))
+
 class Turtlebot(Roomba):
 
   """Represents a Turtlebot robot."""

@@ -22,7 +22,8 @@ add_message_files(DIRECTORY msg
                         
 add_service_files(DIRECTORY srv
                   FILES SetDigitalOutputs.srv
-                        SetTurtlebotMode.srv)
+                        SetTurtlebotMode.srv
+                        SetCleanMotors.srv)
 
 generate_messages(DEPENDENCIES diagnostic_msgs
                                geometry_msgs
