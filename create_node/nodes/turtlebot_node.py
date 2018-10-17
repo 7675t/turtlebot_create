@@ -320,6 +320,14 @@ class TurtlebotNode(object):
         if self._gyro:
             self._gyro.update_calibration(sensor_state)
 
+        # Check if the sensor state is valid. If it is invalid, raise Error and ignore the packet 
+        if abs(sensor_state.distance) > 1.0 or abs(sensor_state.angle) > 1.0:
+            rospy.logwarn("Distance, angle displacement too big, invalid readings from robot. Distance: %.2f, Angle: %.2f" % (sensor_state.distance, sensor_state.angle))
+            raise DriverError
+        if sensor_state.oi_mode not in (1, 2, 3):
+            rospy.logwarn("Invalid OI Mode: %d" % sensor_state.oi_mode)
+            raise DriverError
+
     def spin(self):
 
         # state
